@@ -1,0 +1,42 @@
+express.json()
+    express.json() is a built-in middleware in Express that parses incoming JSON requests and makes the JSON data available in req.body
+
+cors()
+    cors() is a middleware function from the CORS (Cross-Origin Resource Sharing) package that enables secure cross-origin requests in an Express application.
+    By default, web browsers block requests coming from different origins (e.g., frontend on http://localhost:3000 and backend on http://localhost:5000). cors() allows the backend to accept requests from other origins.
+
+Todo.findByIdAndUpdate() 
+
+    options : { new: true } → Ensures the returned document is the updated version, not the old one
+
+
+In simple words, layout.jsx in Next.js is like a wrapper that surrounds all pages and keeps common UI elements (like the header, footer, or sidebar) in one place.
+
+Instead of adding these elements manually on every page, layout.jsx applies them automatically to all pages in your app. 🚀
+
+
+
+You said:
+what goes into the children
+ChatGPT said:
+The children prop in layout.jsx represents the content of the current page being rendered.
+
+For example, if you're on the /about page, children will be the content of that page. If you're on /contact, children will be the contact page.
+
+It allows the layout to stay the same (e.g., keeping the navbar, footer, etc.) while swapping out the main page content dynamically.
+
+
+
+app/page.js → Renders the homepage (/)
+app/about/page.js → Renders the About page (/about)
+app/contact/page.js → Renders the Contact page (/contact)
+
+the page.js Inside every folder is the main content of that particular folder.
+==============================================================================
+
+How Pagination Works in MongoDB
+    .skip(skip): Skips the first N documents.
+    .limit(limit): Limits the number of documents returned.
+
+const todos = await Todo.find().skip(5).limit(5);
+    This skips the first 5 todos and returns the next 5 todos (todos 6-10).
