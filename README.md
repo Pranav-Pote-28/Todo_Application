@@ -44,7 +44,7 @@ npm install
 Create a `.env` file in the `backend` folder:
 or
 Checkout the env file in backend/ folder
-```
+
 
 ### **4. Run the Application**
 #### **Backend**
