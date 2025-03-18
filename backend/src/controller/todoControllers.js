@@ -2,14 +2,14 @@ import Todo from "../models/todoModel.js";
 
 export const createTodo = async(req, res)=>{
 
-    console.log("REceived data",req.body)
+
     try{    
         const todo = new Todo(req.body);
         await todo.save();
 
         let totalPages = await Todo.countDocuments()
         totalPages = Math.ceil(totalPages / 5)
-        console.log("Sending the data:",{todo,totalPages})
+
         res.json({todo, totalPages})
 
     }catch(err){
@@ -31,7 +31,6 @@ export const getTodos = async (req, res) => {
 
     const skipTodos = (page - 1) * limit; 
 
-    console.log(`skipTodos: ${skipTodos}, page: ${page}, limit: ${limit}, search: ${search}`);
 
     const query = search ? { title: { $regex: search, $options: "i" } } : {};
 
