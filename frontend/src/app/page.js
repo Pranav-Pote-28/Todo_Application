@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 
 import TodoList from "../components/TodoList.jsx";
 import TodoEditor from "../components/TodoEditor.jsx";
+import "./styles.css"
 
 export default function HomePage(){
 
@@ -12,17 +13,19 @@ export default function HomePage(){
   const [selectedTodo, setSelectedTodo] = useState(null)
   const [currentPage, setCurrentPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
+  const [searchTerm, setSearchTerm] = useState("")
   const todosPerPage = 5;
 
   useEffect(()=>{
     fetchTodos()
-  },[currentPage])
+  },[currentPage, searchTerm, selectedTodo])
 
-  const fetchTodos = async ()=>{
+  const fetchTodos = async (addedNewPage = false)=>{
     try{
-      const responses = await axios.get(`http://localhost:3000/api/todos?page=${currentPage}&limit=${todosPerPage}`);
+      const responses = await axios.get(`http://localhost:3000/api/todos?page=${currentPage}&limit=${todosPerPage}&search=${searchTerm}`);
       setTodos(responses.data.todos);
-      setTotalPages(responses.data.totalPages)
+      setTotalPages(responses.data.totalPages);
+
     }catch(err){
       console.error("error in fetchTodo", err);
     }
@@ -30,11 +33,12 @@ export default function HomePage(){
 
   const handleSelectedTodo = (todo)=>{
     setSelectedTodo(todo);
-    console.log("selectedtodo: ",selectedTodo)
   }
 
   const handleNewTodo = ()=>{
+    console.log("clicked new todo")
     setSelectedTodo({title: "", description: ""})
+
   }
 
   const handlePrevPage= ()=>{
@@ -43,31 +47,44 @@ export default function HomePage(){
       setCurrentPage((currPage)=>currPage-1)
     }
 
-    handleNewTodo();
+    // handleNewTodo();
   }
 
   const handleNextPage= ()=>{
     setCurrentPage((currPage)=>currPage+1)
+    // handleNewTodo();
+  }
 
-    handleNewTodo();
+  const handleSearch = (e)=>{
+    setSearchTerm(e.target.value);
+    setCurrentPage(1)
   }
 
   return(
-    <div style={{display:"flex", border:"2px solid red"}}>
+    <div className="container">
 
-      <div style={{width:"30%",border:"2px solid blue"}}>
-        <TodoList todos = {todos} onSelectedTodo={handleSelectedTodo} onUpdate={fetchTodos} onClearSelected={()=>{setSelectedTodo(null)}} />
-        <button onClick={()=>handleNewTodo()}>
-          +_create_todo
-        </button>
+      <div className="sidebar">
 
-        <div>
-          <button onClick = {handlePrevPage} disabled={currentPage === 1}>prev</button>
-          <button onClick = {handleNextPage} disabled = {currentPage === totalPages}>next</button>
+        <div className="search-bar">
+          <button onClick={()=>handleNewTodo()} ><img src="/images/create_icon.png" /></button>
+          <input placeholder="Search title" type="text" value={searchTerm} onChange={handleSearch}></input>
+          <img src="/images/search_icon.png"></img>
         </div>
+
+        <TodoList todos = {todos} onSelectedTodo={handleSelectedTodo}  />
+
+
+        <div className="directions">
+          <button onClick = {handlePrevPage} disabled={currentPage === 1}>prev page</button>
+          {currentPage}
+          <button onClick = {handleNextPage} disabled = {currentPage === totalPages}>next page</button>
+        </div>
+
       </div>
 
-      {selectedTodo && <TodoEditor todo={selectedTodo} onUpdate={fetchTodos} />}
+    <div className="editor">
+      {!selectedTodo?<div id="default-message">Your todo description appears here .</div>:selectedTodo && <TodoEditor todo={selectedTodo} onUpdate={(addedNewPage)=>{fetchTodos(addedNewPage)}} setCurrentPage = {setCurrentPage}  onClearSelected={()=>{setSelectedTodo(null)}}/>}
+    </div>
        
     </div>
   )

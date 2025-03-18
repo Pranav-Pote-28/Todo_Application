@@ -1,40 +1,39 @@
 import React from "react";
-import axios from "axios";
 
-function TodoList({todos, onSelectedTodo, onUpdate, onClearSelected}){
-
-    const handleDelete =async(id)=>{
-        try {
-
-            await axios.delete(`http://localhost:3000/api/todos/${id}`)
-            onUpdate();
-            onClearSelected();
-            
-        } catch (error) {
-            console.error("error in handleDelete",error)
-        }
-    }
-
+function TodoList({ todos, onSelectedTodo }) {
     return (
-        <div style={{width:"100%", border:"2px solid green",padding:"20px",borderRight:"6px solid gray"}}>
-            <h2>todo list</h2>
+        <div className="todos-container">
+            {todos.length === 0 ? (
+                <p>Todo list is not present</p>
+            ) : (
+                <ul className="todo-list">
+                    {todos.map((todo) => {
 
-            {todos.length === 0 ?( <p>todolist is not present</p>):
-                (
-                <ul>
-                    {todos.map((todo)=>(
-                        <li key={todo._id} 
-                            style={{cursor:"pointer", padding:"5px", border:"2px solid green", borderBottom: "1px solid #ccc"}}
-                            onClick={()=>{onSelectedTodo(todo)}}>
-                            {todo.title}
-                            <button onClick={()=>handleDelete(todo._id)}>
-                                X
-                            </button>
-                        </li>
-                    ))}
-                
+                        let formattedDate = "No date available";
+                        if (todo.date) {
+                            const dateObj = new Date(todo.date);
+                            formattedDate = dateObj.toLocaleDateString("en-US", {
+                                year: "numeric",
+                                month: "long",
+                                day: "numeric",
+                            });
+                        }
+
+                        return (
+                            <li key={todo._id} onClick={() => onSelectedTodo(todo)} className="todo-item">
+                                <div className="todo-heading">{todo.title}</div>
+                                <div className="todo-content">
+                                    <div className="todo-description">
+                                        {todo.description.length >45 ? todo.description.slice(0,42)+" ...":todo.description
+                                        }
+                                    </div>
+                                    <div className="todo-date">{formattedDate}</div> {/* Display formatted date */}
+                                </div>
+                            </li>
+                        );
+                    })}
                 </ul>
-                )}
+            )}
         </div>
     );
 }

@@ -2,10 +2,15 @@ import Todo from "../models/todoModel.js";
 
 export const createTodo = async(req, res)=>{
 
+    console.log("REceived data",req.body)
     try{    
         const todo = new Todo(req.body);
         await todo.save();
-        res.json(todo)
+
+        let totalPages = await Todo.countDocuments()
+        totalPages = Math.ceil(totalPages / 5)
+        console.log("Sending the data:",{todo,totalPages})
+        res.json({todo, totalPages})
 
     }catch(err){
         console.log(`error in post method ${err.message}`)
@@ -14,32 +19,37 @@ export const createTodo = async(req, res)=>{
 
 }
 
-export const getTodos =  async(req,res)=>{
+export const getTodos = async (req, res) => {
+  try {
 
 
+    let {page = "1", limit = "5", search = "" ,lastPage} = req.query;
 
-    try{
-    const currentPage = parseInt(req.query.page )|| 1;
-    const limit = parseInt(req.query.limit) || 5;
-    const skipTodos = (currentPage - 1)*limit;
-    
-    const totalTodos = await Todo.countDocuments();
-    const todos = await Todo.find().skip(skipTodos).limit(limit);
-    res.json({todos, totalPages: Math.ceil(totalTodos/limit)});
+    page = parseInt(page);
+    lastPage = parseInt(lastPage);
+    limit = parseInt(limit);
 
-    }catch(err){
-        console.log(`error in the get method ${err.message}`);
-        res.status(500).json({err:err.message})
-    }
+    const skipTodos = (page - 1) * limit; 
 
-}
+    console.log(`skipTodos: ${skipTodos}, page: ${page}, limit: ${limit}, search: ${search}`);
+
+    const query = search ? { title: { $regex: search, $options: "i" } } : {};
+
+    const totalTodos = await Todo.countDocuments(query);
+    const todos = await Todo.find(query).skip(skipTodos).limit(limit);
+
+    res.json({ todos, totalPages: Math.ceil(totalTodos / limit) });
+  } catch (err) {
+    console.log(`Error in the GET method: ${err.message}`);
+    res.status(500).json({ error: err.message });
+  }
+};
 
 export const updateTodo = async(req,res)=>{
     try{
         const getTodo = await Todo.findOne({_id: req.params.id});
 
         if(!getTodo){
-            console.log("hi 1");
             return res.status(404).json({err:"couldnt find the todo list"});
         }
 
